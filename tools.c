@@ -6,7 +6,7 @@
 /*   By: ckrommen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/01 18:15:22 by ckrommen          #+#    #+#             */
-/*   Updated: 2018/05/05 17:19:30 by ckrommen         ###   ########.fr       */
+/*   Updated: 2018/05/06 20:31:48 by ckrommen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,44 +14,43 @@
 
 int		load_flags(t_info *info, char **argv)
 {
-	int i;
-	int x;
+	int	i;
+	int	x;
 
-	i = 1;
-	while (argv[i] && argv[i][0] == '-')
+	i = 0;
+	while (argv[++i] && argv[i][0] == '-')
 	{
 		x = 1;
 		while (argv[i][x])
 		{
 			if (argv[i][x] == 'R')
-				info->re = true;
+				info->re = 1;
 			else if (argv[i][x] == 'a')
-				info->a = true;
+				info->a = 1;
 			else if (argv[i][x] == 't')
-				info->t = true;
+				info->t = 1;
 			else if (argv[i][x] == 'r')
-				info->r = true;
+				info->r = 1;
 			else if (argv[i][x] == 'l')
-				info->l = true;
+				info->l = 1;
 			else
 				return (-1);
 			x++;
 		}
-		i++;
 	}
 	return (i);
 }
 
 t_info	init_info(int argc, int dc)
 {
-	t_info info;
+	t_info	info;
 
-	info.re = false;
-	info.a = false;
-	info.l = false;
-	info.r = false;
-	info.t = false;
-	info.is_err = false;
+	info.re = 0;
+	info.a = 0;
+	info.l = 0;
+	info.r = 0;
+	info.t = 0;
+	info.is_err = 0;
 	info.dc = dc;
 	info.pc = 0;
 	info.argc = argc;
@@ -60,33 +59,31 @@ t_info	init_info(int argc, int dc)
 	return (info);
 }
 
-t_dir	*init_dir(char *dir_name, char *name,  struct stat info, struct dirent *d_info)
+t_dir	*init_dir(char *dir_name, char *name)
 {
-	t_dir *dir;
+	t_dir	*dir;
 
 	dir = (t_dir *)malloc(sizeof(t_dir));
 	ft_bzero(dir->path, 256);
 	ft_bzero(dir->name, 256);
 	ft_strcpy(dir->path, dir_name);
 	ft_strcpy(dir->name, name);
-	ft_bzero(&(dir->stat), sizeof(struct stat));
-	dir->stat = info;
-	dir->d_info = d_info;
-	dir->is_dir = false;
+	dir->perm = 1;
+	dir->is_dir = 0;
 	dir->next = NULL;
 	dir->prev = NULL;
 	dir->sub_dir = NULL;
 	return (dir);
 }
 
-void	add_dir(t_dir **head, char *dir, char *name, struct stat info, struct dirent *d_info)
+t_dir	*add_dir(t_dir **head, char *dir, char *name)
 {
 	t_dir	*elem;
 	t_dir	*ptr;
 
 	if (*head)
 	{
-		elem = init_dir(dir, name, info, d_info);
+		elem = init_dir(dir, name);
 		ptr = *head;
 		while (ptr->next)
 			ptr = ptr->next;
@@ -94,39 +91,29 @@ void	add_dir(t_dir **head, char *dir, char *name, struct stat info, struct diren
 		elem->prev = ptr;
 	}
 	else
-		*head = init_dir(dir, name, info, d_info);
+		*head = init_dir(dir, name);
+	return (NULL);
 }
 
-int		count_dir(char **argv)
+t_dir	*add_badperm(t_dir **head, char *dir, char *name)
 {
-	int i;
-	int count;
+	t_dir	*elem;
+	t_dir	*ptr;
 
-	count = 0;
-	i = 1;
-	while (argv[i])
+	if (*head)
 	{
-		if (argv[i][0] == '-')
-			i++;
-		else
-		{
-			count++;
-			i++;
-		}
+		elem = init_dir(dir, name);
+		elem->perm = 0;
+		ptr = *head;
+		while (ptr->next)
+			ptr = ptr->next;
+		ptr->next = elem;
+		elem->prev = ptr;
 	}
-	return (count);
-}
-
-int		check_subdir(t_dir *head)
-{
-	int i;
-
-	i = 0;
-	while (head)
+	else
 	{
-		if (head->is_dir)
-			i = 1;
-		head = head->next;
+		*head = init_dir(dir, name);
+		(*head)->perm = 0;
 	}
-	return (i);
+	return (*head);
 }

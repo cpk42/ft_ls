@@ -6,7 +6,7 @@
 /*   By: ckrommen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/05 14:29:38 by ckrommen          #+#    #+#             */
-/*   Updated: 2018/05/05 17:59:07 by ckrommen         ###   ########.fr       */
+/*   Updated: 2018/05/06 18:01:09 by ckrommen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,16 @@ void	print_list(t_dir *list, t_info *info)
 	t_dir	*ptr;
 
 	ptr = list;
-	if (list == ptr && ((*info).re || (*info).dc > 1))
+	if (list == ptr && ((*info).re || (*info).dc > 1) && list->perm)
 		ft_printf("%s:\n", list->path);
 	print_blocks(list, info);
 	while (list)
 	{
-		ft_printf("%s%s\n", get_info(list, info), list->name);
+		list->perm ? INFO : ERROR;
 		list->is_dir = (list->sub_dir) ? true : false;
-//		ft_printf("%s %s%d %d\n", (*list).name, (*ptr).name, (*info).re, list->is_dir);
 		list = list->next;
 	}
 	(*info).pc++;
-//	ft_printf("%d%d\n", info->pc, info->dc);
 	if (!check_subdir(ptr) && ((*info).pc < (*info).dc))
 		ft_putendl("");
 	while (ptr)
@@ -55,12 +53,12 @@ void	rev_print_list(t_dir *list, t_info *info)
 
 	list = get_end(list);
 	ptr = list;
-	if (list == ptr && ((*info).re || (*info).dc > 1))
+	if (list == ptr && ((*info).re || (*info).dc > 1) && list->perm)
 		ft_printf("%s:\n", list->path);
 	print_blocks(list, info);
 	while (list)
 	{
-		ft_printf("%s%s\n", get_info(list, info), list->name);
+		list->perm ? INFO : ERROR;
 		list->is_dir = (list->sub_dir) ? true : false;
 		list = list->prev;
 	}

@@ -6,7 +6,7 @@
 /*   By: ckrommen <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/05/04 20:19:05 by ckrommen          #+#    #+#             */
-/*   Updated: 2018/05/05 14:53:00 by ckrommen         ###   ########.fr       */
+/*   Updated: 2018/05/06 20:57:17 by ckrommen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,10 @@ void	build_path(char *str, t_dir *list)
 
 void	print_perms(struct stat stat)
 {
-	ft_putchar((S_ISDIR(stat.st_mode)) ? 'd' : '-');
+	if (S_ISLNK(stat.st_mode))
+		ft_putchar('l');
+	else
+		ft_putchar((S_ISDIR(stat.st_mode)) ? 'd' : '-');
 	ft_putchar((stat.st_mode & S_IRUSR) ? 'r' : '-');
 	ft_putchar((stat.st_mode & S_IWUSR) ? 'w' : '-');
 	ft_putchar((stat.st_mode & S_IXUSR) ? 'x' : '-');
@@ -36,10 +39,10 @@ void	print_perms(struct stat stat)
 
 void	print_time(char *str)
 {
-	char format[1024];
-	int i;
-	int x;
-	int colon;
+	char	format[1024];
+	int		i;
+	int		x;
+	int		colon;
 
 	ft_bzero(format, 1024);
 	i = 0;
@@ -52,7 +55,7 @@ void	print_time(char *str)
 		if (str[i] == ':')
 			colon++;
 		if (colon == 2)
-			break;
+			break ;
 		format[x++] = str[i++];
 	}
 	ft_printf(format);
@@ -60,10 +63,11 @@ void	print_time(char *str)
 
 char	*get_info(t_dir *list, t_info *info)
 {
-	char	path[1024];
-	struct stat stat;
-	struct passwd *pw;
-	struct group  *gr;
+	char			path[1024];
+	char			str[1024];
+	struct stat		stat;
+	struct passwd	*pw;
+	struct group	*gr;
 
 	ft_bzero(path, 1024);
 	ft_bzero(path, sizeof(struct stat));
@@ -77,10 +81,12 @@ char	*get_info(t_dir *list, t_info *info)
 		ft_printf("%4d ", stat.st_nlink);
 		ft_printf("%-10s%-10s%6d", pw->pw_name, gr->gr_name, stat.st_size);
 		print_time(ctime(&stat.st_mtime));
-		return (" ");
+		ft_printf(" %s", list->name);
+		readlink(path, str, 1024);
+		if (S_ISLNK(stat.st_mode))
+			ft_printf(" -> %s", str);
 	}
-	else
-		return ("");
+	return ("");
 }
 
 void	print_blocks(t_dir *list, t_info *info)
@@ -92,7 +98,7 @@ void	print_blocks(t_dir *list, t_info *info)
 	total = 0;
 	ft_bzero(path, 1024);
 	ft_bzero(path, sizeof(struct stat));
-	if (info->l)
+	if (info->l && list->perm)
 	{
 		while (list)
 		{

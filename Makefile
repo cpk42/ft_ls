@@ -6,11 +6,11 @@
 #    By: ckrommen <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/01 17:23:01 by ckrommen          #+#    #+#              #
-#    Updated: 2018/05/05 18:59:35 by ckrommen         ###   ########.fr        #
+#    Updated: 2018/05/06 20:15:23 by ckrommen         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
-SRCS = ft_ls.c tools.c sort.c error.c display.c print.c utilities.c
+SRCS = ft_ls.c tools.c sort.c error.c display.c print.c utilities.c free.c
 
 FLAGS = -Wall -Wextra -Werror
 
